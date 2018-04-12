@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoaiBaoThuc.ActivityLoaiBaoThuc">
+
+    <LinearLayout
+        android:id="@+id/LineearLayoutLoaiQR"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="204dp"
+        android:background="#eaeaea"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/qrcode" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Mã vạch/mã QR"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LineearLayoutLoaiLamToan"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="204dp"
+        android:background="#eaeaea"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/math" />
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Giải toán"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LineearLayoutLoaiLac"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="24dp"
+        android:background="#eaeaea"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <ImageView
+            android:id="@+id/imageViewLoaiLac"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/shakephone" />
+
+        <TextView
+            android:id="@+id/textViewLoaiGiaiToan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Lắc điện thoại"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/LineearLayoutMacDinh"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:background="#eaeaea"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <ImageView
+            android:id="@+id/imageViewMacDinh"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            app:srcCompat="@drawable/alarm" />
+
+        <TextView
+            android:id="@+id/textViewMacDinh"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Mặc định"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="28dp"
+        android:text="Chon Loai Bao Thuc"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/buttonLoaiBaoThucXacNhan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="32dp"
+        android:text="Xác nhận"
+        app:layout_constraintEnd_toStartOf="@+id/buttonLoaiBaoThucHuy"
+        app:layout_constraintTop_toBottomOf="@+id/LineearLayoutLoaiLamToan" />
+
+    <Button
+        android:id="@+id/buttonLoaiBaoThucHuy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="32dp"
+        android:text="Huỷ"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/LineearLayoutLoaiQR" />
+
+</android.support.constraint.ConstraintLayout>
