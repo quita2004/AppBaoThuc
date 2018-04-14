@@ -25,7 +25,9 @@
 
         <service
             android:name=".PhatBaoThuc.Music"
-            android:enabled="true" />
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="false"/>
 
         <activity android:name=".LoaiBaoThuc.ActivityLoaiLac" />
         <activity android:name=".TatBaoThuc.ActivityTatBaoThucMacDinh" />

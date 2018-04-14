@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.ngocqui.appbaothuc.Database.Databases;
+import com.example.ngocqui.appbaothuc.MainActivity;
 import com.example.ngocqui.appbaothuc.PhatBaoThuc.AlarmReceiver;
 import com.example.ngocqui.appbaothuc.PhatBaoThuc.Music;
 import com.example.ngocqui.appbaothuc.R;
@@ -43,8 +44,18 @@ public class ActivityTatBaoThucMacDinh extends Activity {
                 Intent intentAlarmReceiver = new Intent(ActivityTatBaoThucMacDinh.this, Music.class);
                 intentAlarmReceiver.putExtra("extra", "off");
                 startService(intentAlarmReceiver);
-                finish();
+//                finish();
+
+                Intent mainInten = new Intent(ActivityTatBaoThucMacDinh.this, MainActivity.class);
+                startActivity(mainInten);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.d("bbb", "mac dinh destroy");
     }
 }

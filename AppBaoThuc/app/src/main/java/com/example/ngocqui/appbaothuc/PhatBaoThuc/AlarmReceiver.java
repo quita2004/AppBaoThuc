@@ -32,8 +32,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         myItent.putExtra("LoaiBaoThuc", loaiBaoThuc);
         myItent.putExtra("id", id);
 
-        Log.d("aaa", "chuoi "+ chuoi);
-
         context.startService(myItent);
 
 

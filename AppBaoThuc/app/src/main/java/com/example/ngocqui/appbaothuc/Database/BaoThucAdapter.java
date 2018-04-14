@@ -93,7 +93,7 @@ public class BaoThucAdapter extends BaseAdapter {
                 holder.imgLoaiBaoThuc.setImageResource(R.drawable.qrcode);
                 break;
         }
-        Log.d("bbb", "bao thuc "+ baoThuc.getId()+" bat "+baoThuc.getIsBat());
+
         if (baoThuc.getIsBat() == 1){
             holder.cbBat.setChecked(true);
         } else{
@@ -109,7 +109,7 @@ public class BaoThucAdapter extends BaseAdapter {
                 PendingIntent pendingIntent = null;
                 Databases databases = new Databases(context, "baothuc.sqlite", null, 1);
 
-                if ( holder.cbBat.isChecked() == true){
+                if ( holder.cbBat.isChecked()){
                     String thoiGian = baoThuc.getThoiGian();
                     int hour = Integer.parseInt(thoiGian.substring(0,2));
                     int mi = Integer.parseInt(thoiGian.substring(3,5));
@@ -131,7 +131,7 @@ public class BaoThucAdapter extends BaseAdapter {
                     }
 
                     pendingIntent = PendingIntent.getBroadcast(
-                            context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                            context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT
                     );
 
                     alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
@@ -140,8 +140,7 @@ public class BaoThucAdapter extends BaseAdapter {
                     databases.QueryData("UPDATE BaoThuc SET IsTurn = 1 WHERE id =" + id);
 
                     Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
-                } else if ( holder.cbBat.isChecked() == false){
-                    alarmManager.cancel(pendingIntent);
+                } else if ( !holder.cbBat.isChecked()){
                     Toast.makeText(context, "Tắt báo thức", Toast.LENGTH_SHORT).show();
 
                     databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
