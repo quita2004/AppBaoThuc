@@ -6,6 +6,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -20,6 +23,7 @@ import com.example.ngocqui.appbaothuc.TatBaoThuc.ActivityTatBaothucGiaiToan;
 public class Music extends Service {
 
     MediaPlayer mediaPlayer;
+    Ringtone ringtoneAlarm;
     int id = 1;
     String key = "";
     static  int loaiBaoThuc = 0;
@@ -53,9 +57,12 @@ public class Music extends Service {
 
         if (id == 1) {
 
-            if (mediaPlayer == null){
-                mediaPlayer = MediaPlayer.create(this, R.raw.demo);
-                mediaPlayer.start();
+            if (ringtoneAlarm == null){
+//                mediaPlayer = MediaPlayer.create(this, R.raw.demo);
+//                mediaPlayer.start();
+                Uri alarmTone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                ringtoneAlarm = RingtoneManager.getRingtone(getApplicationContext(), alarmTone);
+                ringtoneAlarm.play();
             }
 
             Intent tatIntent = new Intent(this, ActivityTatBaoThucMacDinh.class);
@@ -81,9 +88,9 @@ public class Music extends Service {
             Log.d("aaa", "goi lan dau " + idLoaiBaoThuc + " , " + idBaoThuc);
             id = 0;
         } else if (id == 0) {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-                mediaPlayer = null;
+            if (ringtoneAlarm != null) {
+                ringtoneAlarm.stop();
+                ringtoneAlarm = null;
             }
 
 

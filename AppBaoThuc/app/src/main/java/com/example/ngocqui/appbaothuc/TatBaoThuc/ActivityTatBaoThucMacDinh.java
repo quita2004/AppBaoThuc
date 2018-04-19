@@ -3,8 +3,12 @@ package com.example.ngocqui.appbaothuc.TatBaoThuc;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +30,7 @@ public class ActivityTatBaoThucMacDinh extends Activity {
     Button btnTatmacDinh;
 
     int id;
+    Vibrator vi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,18 +42,32 @@ public class ActivityTatBaoThucMacDinh extends Activity {
         final Intent getIntent = getIntent();
         id = getIntent.getIntExtra("id", 0);
 
+        vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        long[] pattern = {0, 100, 1000};
+        // Vibrate for 5000000 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vi.vibrate(VibrationEffect.createOneShot(5000000 ,VibrationEffect.DEFAULT_AMPLITUDE));
+        }else{
+            //deprecated in API 26
+            vi.vibrate(pattern, 0);
+        }
+
 
 
         btnTatmacDinh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkBaoThucLAp();
+                //tắt rung
+                vi.cancel();
 
                 Log.d("ccc", "id "+id);
 
                 Intent intentAlarmReceiver = new Intent(ActivityTatBaoThucMacDinh.this, Music.class);
                 intentAlarmReceiver.putExtra("extra", "off");
                 startService(intentAlarmReceiver);
+                stopService(intentAlarmReceiver);
+
 
                 Intent mainInten = new Intent(ActivityTatBaoThucMacDinh.this, MainActivity.class);
                 startActivity(mainInten);
@@ -63,14 +82,16 @@ public class ActivityTatBaoThucMacDinh extends Activity {
             Databases databases = new Databases(this, "baothuc.sqlite", null, 1);
             Calendar calendar = Calendar.getInstance();
 
-            Cursor dataNgayLap = databases.getData("select * from NgayLap where id = " + id);
+            Cursor dataNgayLap = databases.getData("select * from NgayLap where IdBaoThuc = " + id);
             if (dataNgayLap.getCount() == 0){
                 if (id != 0){
                     databases = new Databases(ActivityTatBaoThucMacDinh.this, "baothuc.sqlite", null, 1);
                     databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
+                    Log.d("xxx", "xoá bt đơn");
 
                 }
             }else {
+
                 databases.QueryData("UPDATE BaoThuc SET IsTurn = 1 WHERE id =" + id);
                 String thoiGian = "";
                 Cursor dataBaoThuc = databases.getData("select * from BaoThuc where id = " + id);

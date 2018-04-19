@@ -10,6 +10,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +46,8 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
     TextView txtSoLanLac;
     TextView txtTatLacTitle;
 
+    Vibrator vi;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,17 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
 
         txtSoLanLac = findViewById(R.id.textViewSoLanLac);
         txtTatLacTitle = findViewById(R.id.textViewTatLacTitle);
+
+        //tạo rung
+        vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        long[] pattern = {0, 100, 1000};
+        // Vibrate for 5000000 milliseconds
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vi.vibrate(VibrationEffect.createOneShot(5000000 ,VibrationEffect.DEFAULT_AMPLITUDE));
+        }else{
+            //deprecated in API 26
+            vi.vibrate(pattern, 0);
+        }
 
         Intent intent = getIntent();
         idLoaiBaoThuc = intent.getIntExtra("idLoaiBaoThuc", 123);
@@ -86,12 +102,18 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
 
     }
     public void TatBaoThuc(){
+        //tắt rung
+        vi.cancel();
 
         checkBaoThucLAp();
 
         Intent intentAlarmReceiver = new Intent(ActivityTatBaoThucLac.this, Music.class);
         intentAlarmReceiver.putExtra("extra", "off");
         startService(intentAlarmReceiver);
+        stopService(intentAlarmReceiver);
+
+        Intent mainInten = new Intent(ActivityTatBaoThucLac.this, MainActivity.class);
+        startActivity(mainInten);
 
     }
 
@@ -144,7 +166,7 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
             Databases databases = new Databases(this, "baothuc.sqlite", null, 1);
             Calendar calendar = Calendar.getInstance();
 
-            Cursor dataNgayLap = databases.getData("select * from NgayLap where id = " + id);
+            Cursor dataNgayLap = databases.getData("select * from NgayLap where IdBaoThuc = " + id);
             if (dataNgayLap.getCount() == 0){
                 if (id != 0){
                     databases = new Databases(ActivityTatBaoThucLac.this, "baothuc.sqlite", null, 1);
