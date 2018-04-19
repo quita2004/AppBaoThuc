@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,9 +55,10 @@ public class BaoThucAdapter extends BaseAdapter {
     }
 
     private class ViewHolder{
-        TextView txtGio;
+        TextView txtGio, txtNgayLap;
         CheckBox cbBat;
         ImageView imgLoaiBaoThuc;
+
     }
 
     @Override
@@ -71,6 +73,8 @@ public class BaoThucAdapter extends BaseAdapter {
             holder.txtGio = convertView.findViewById(R.id.textViewGioBaoThuc);
             holder.cbBat = convertView.findViewById(R.id.checkBoxBaoThuc);
             holder.imgLoaiBaoThuc = convertView.findViewById(R.id.imageViewLoaiBaoThuc);
+            holder.txtNgayLap = convertView.findViewById(R.id.textViewDongBaoThucNgayLap);
+
 
             convertView.setTag(holder);
         } else {
@@ -78,6 +82,7 @@ public class BaoThucAdapter extends BaseAdapter {
         }
 
         baoThuc = baoThucList.get(position);
+        id = baoThuc.getId();
         holder.txtGio.setText(baoThuc.getThoiGian()+"");
         switch (baoThuc.getCachTat()){
             case 0:
@@ -100,14 +105,17 @@ public class BaoThucAdapter extends BaseAdapter {
             holder.cbBat.setChecked(false);
         }
 
+
+        checkNgayLap(holder.txtNgayLap );
+
         //bat su kien sua
         holder.cbBat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                id = baoThuc.getId();
                 AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);;
                 PendingIntent pendingIntent = null;
                 Databases databases = new Databases(context, "baothuc.sqlite", null, 1);
+                Cursor dataNgayLap = databases.getData("select * from NgayLap where IdBaoThuc = " + id);
 
                 if ( holder.cbBat.isChecked()){
                     String thoiGian = baoThuc.getThoiGian();
@@ -124,32 +132,69 @@ public class BaoThucAdapter extends BaseAdapter {
                     calendar.set(Calendar.HOUR_OF_DAY, hour);
                     calendar.set(Calendar.MINUTE, mi);
 
-                    Calendar cld = Calendar.getInstance();
+//                    Calendar cld = Calendar.getInstance();
+//
+////                    if (calendar.getTimeInMillis() < cld.getTimeInMillis()){
+////                        calendar.set(Calendar.DATE, date+1);
+////                    }
 
-                    if (calendar.getTimeInMillis() < cld.getTimeInMillis()){
-                        calendar.set(Calendar.DATE, date+1);
+
+                    if (dataNgayLap.getCount() == 0){
+                        pendingIntent = PendingIntent.getBroadcast(
+                                context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+                    } else {
+                        while (dataNgayLap.moveToNext()){
+                            int ngayLap = dataNgayLap.getInt(2);
+
+                            int cong = 0;
+
+                            calendar.set(Calendar.DAY_OF_WEEK, ngayLap);
+                            if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+                                calendar.add(Calendar.DAY_OF_YEAR, 7);
+                                cong = 1;
+                            }
+
+                            pendingIntent = PendingIntent.getBroadcast(
+                                    context, (id + 1) * 10000 + ngayLap, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+
+                            if (cong == 1) {
+                                calendar.add(Calendar.DAY_OF_YEAR, -7);
+                            }
+                        }
                     }
 
-                    pendingIntent = PendingIntent.getBroadcast(
-                            context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT
-                    );
-
-                    alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-
-
                     databases.QueryData("UPDATE BaoThuc SET IsTurn = 1 WHERE id =" + id);
-
                     Toast.makeText(context, "Thêm thành công", Toast.LENGTH_SHORT).show();
                 } else if ( !holder.cbBat.isChecked()){
+                    if (dataNgayLap.getCount() == 0){
+                        PendingIntent alarmIntent;
+                        alarmIntent = PendingIntent.getBroadcast(context, id,
+                                new Intent(context, AlarmReceiver.class),
+                                PendingIntent.FLAG_CANCEL_CURRENT);
+                        alarmIntent.cancel();
+                    } else {
+                        while (dataNgayLap.moveToNext()){
+                            int ngayLap = dataNgayLap.getInt(2);
+                            PendingIntent alarmIntent;
+                            alarmIntent = PendingIntent.getBroadcast(context, (id + 1) * 10000 + ngayLap,
+                                    new Intent(context, AlarmReceiver.class),
+                                    PendingIntent.FLAG_CANCEL_CURRENT);
+                            alarmIntent.cancel();
+                        }
+                    }
+
                     Toast.makeText(context, "Tắt báo thức", Toast.LENGTH_SHORT).show();
 
                     databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
 
-                    PendingIntent alarmIntent;
-                    alarmIntent = PendingIntent.getBroadcast(context, id,
-                            new Intent(context, AlarmReceiver.class),
-                            PendingIntent.FLAG_CANCEL_CURRENT);
-                    alarmIntent.cancel();
+
+
                 }
 
             }
@@ -165,5 +210,28 @@ public class BaoThucAdapter extends BaseAdapter {
         });
 
         return convertView;
+    }
+    private void checkNgayLap(TextView tv){
+        if (id != 0){
+            Databases databases = new Databases(context, "baothuc.sqlite", null, 1);
+            Cursor dataNgayLap = databases.getData("select * from NgayLap where IdBaoThuc = " + id);
+
+            Log.d("ddd", "id = "+id);
+            String textNgaylap = "";
+            while (dataNgayLap.moveToNext()){
+                int ngayLap = dataNgayLap.getInt(2);
+                if (ngayLap > 1){
+                    textNgaylap += "Th " + ngayLap + ". ";
+                } else if (ngayLap == 1){
+                    textNgaylap += "CN.";
+                }
+            }
+
+            if (dataNgayLap.getCount() > 0){
+                tv.setText(textNgaylap);
+            } else {
+                tv.setText("Không lặp");
+            }
+        }
     }
 }

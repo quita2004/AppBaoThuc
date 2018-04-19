@@ -52,11 +52,11 @@ public class Music extends Service {
 
 
         if (id == 1) {
+
             if (mediaPlayer == null){
                 mediaPlayer = MediaPlayer.create(this, R.raw.demo);
                 mediaPlayer.start();
             }
-
 
             Intent tatIntent = new Intent(this, ActivityTatBaoThucMacDinh.class);
             idLoaiBaoThuc = intent.getIntExtra("IdLoaiBaoThuc", 0);
@@ -83,6 +83,7 @@ public class Music extends Service {
         } else if (id == 0) {
             if (mediaPlayer != null) {
                 mediaPlayer.stop();
+                mediaPlayer = null;
             }
 
 

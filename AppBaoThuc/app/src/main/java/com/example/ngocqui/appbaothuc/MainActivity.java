@@ -2,6 +2,7 @@ package com.example.ngocqui.appbaothuc;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<BaoThuc> arrayBaoThuc;
     BaoThucAdapter adapter;
 
-    Button btnThem;
+    FloatingActionButton btnThem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
 //        databases.QueryData("DROP TABLE BaoThuc");
         databases.QueryData(
                 "CREATE TABLE IF NOT EXISTS BaoThuc( Id INTEGER PRIMARY KEY AUTOINCREMENT , ThoiGian TIME, LoaiBaoThuc INTEGER, IdLoaiBaoThuc INTEGER, IsTurn INTEGER)");
-
-//        databases.QueryData("INSERT INTO CongViec VALUES(null, 1, " + thoiGian + ")");
     }
 
     private  void GetDataBT(){

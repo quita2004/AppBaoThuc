@@ -22,6 +22,8 @@ import com.example.ngocqui.appbaothuc.PhatBaoThuc.AlarmReceiver;
 import com.example.ngocqui.appbaothuc.PhatBaoThuc.Music;
 import com.example.ngocqui.appbaothuc.R;
 
+import java.util.Calendar;
+
 public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEventListener {
 
     Databases databases;
@@ -33,6 +35,7 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
 
     int soLanLac = 0;
     int idLoaiBaoThuc = 1;
+    int id;
 
     int SO_LAN_PHAI_LAC = 10;
     int LOAI_LAC = 3000;
@@ -51,6 +54,7 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
 
         Intent intent = getIntent();
         idLoaiBaoThuc = intent.getIntExtra("idLoaiBaoThuc", 123);
+        id = intent.getIntExtra("id", 0);
 
         //lay thong tin so lan lac va do nhay
         databases = new Databases(this, "baothuc.sqlite", null, 1);
@@ -83,14 +87,7 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
     }
     public void TatBaoThuc(){
 
-        Intent getIntent = getIntent();
-        int id = getIntent.getIntExtra("id", 0);
-        Log.d("ccc", "id "+id);
-
-        if (id != 0){
-            databases = new Databases(this, "baothuc.sqlite", null, 1);
-            databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
-        }
+        checkBaoThucLAp();
 
         Intent intentAlarmReceiver = new Intent(ActivityTatBaoThucLac.this, Music.class);
         intentAlarmReceiver.putExtra("extra", "off");
@@ -138,5 +135,46 @@ public class ActivityTatBaoThucLac extends AppCompatActivity implements SensorEv
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private void checkBaoThucLAp() {
+        Log.d("aaa", "id "+id);
+
+        if (id != 0){
+            Databases databases = new Databases(this, "baothuc.sqlite", null, 1);
+            Calendar calendar = Calendar.getInstance();
+
+            Cursor dataNgayLap = databases.getData("select * from NgayLap where id = " + id);
+            if (dataNgayLap.getCount() == 0){
+                if (id != 0){
+                    databases = new Databases(ActivityTatBaoThucLac.this, "baothuc.sqlite", null, 1);
+                    databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
+
+                }
+            }else {
+                databases.QueryData("UPDATE BaoThuc SET IsTurn = 1 WHERE id =" + id);
+                String thoiGian = "";
+                Cursor dataBaoThuc = databases.getData("select * from BaoThuc where id = " + id);
+                final Intent intent = new Intent(ActivityTatBaoThucLac.this, AlarmReceiver.class);
+
+                while (dataBaoThuc.moveToNext()){
+                    thoiGian = dataBaoThuc.getString(1);
+                }
+                int hour = Integer.parseInt(thoiGian.substring(0, 2));
+                int mi = Integer.parseInt(thoiGian.substring(3, 5));
+
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.set(Calendar.MINUTE, mi);
+                calendar.set(Calendar.SECOND, 0);
+
+                int thu = calendar.get(Calendar.DAY_OF_WEEK);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        ActivityTatBaoThucLac.this, (id + 1) * 10000 + thu, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                );
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 7*24*60*60*1000, pendingIntent);
+            }
+        }
     }
 }

@@ -15,10 +15,12 @@ import android.widget.Toast;
 
 import com.example.ngocqui.appbaothuc.Database.Databases;
 import com.example.ngocqui.appbaothuc.LoaiBaoThuc.ActivityLoaiGiaiToan;
+import com.example.ngocqui.appbaothuc.MainActivity;
 import com.example.ngocqui.appbaothuc.PhatBaoThuc.AlarmReceiver;
 import com.example.ngocqui.appbaothuc.PhatBaoThuc.Music;
 import com.example.ngocqui.appbaothuc.R;
 
+import java.util.Calendar;
 import java.util.Random;
 
 public class ActivityTatBaothucGiaiToan extends AppCompatActivity {
@@ -32,6 +34,7 @@ public class ActivityTatBaothucGiaiToan extends AppCompatActivity {
     int tongSoPhepTinh = 3;
     int doKho = 1;
     int phepTinhLamDuoc = 0;
+    int id;
 
     int idLoaiBaoThuc = 1;
 
@@ -50,6 +53,7 @@ public class ActivityTatBaothucGiaiToan extends AppCompatActivity {
 
         Intent intent = getIntent();
         idLoaiBaoThuc = intent.getIntExtra("idLoaiBaoThuc", 123);
+        id = intent.getIntExtra("id", 0);
 
         //lay thong tin so lan lac va do nhay
         databases = new Databases(this, "baothuc.sqlite", null, 1);
@@ -95,14 +99,9 @@ public class ActivityTatBaothucGiaiToan extends AppCompatActivity {
         intentAlarmReceiver.putExtra("extra", "off");
         startService(intentAlarmReceiver);
 
-        Intent getIntent = getIntent();
-        int id = getIntent.getIntExtra("id", 0);
-
-        if (id != 0){
-            databases = new Databases(this, "baothuc.sqlite", null, 1);
-            databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
-        }
-        finish();
+        checkBaoThucLAp();
+        Intent mainInten = new Intent(ActivityTatBaothucGiaiToan.this, MainActivity.class);
+        startActivity(mainInten);
     }
 
     private void TaoCauHoi(int doKho){
@@ -113,5 +112,44 @@ public class ActivityTatBaothucGiaiToan extends AppCompatActivity {
          b = r.nextInt(so - (int) Math.pow(10, doKho)) + (int) Math.pow(10, doKho);
          c = r.nextInt(so - (int) Math.pow(10, doKho)) + (int) Math.pow(10, doKho);
          txtTatGiaiToanCauHoi.setText(a + "+" + b + "+" + c + "=?");
+    }
+
+    private void checkBaoThucLAp() {
+        if (id != 0){
+            Databases databases = new Databases(this, "baothuc.sqlite", null, 1);
+            Calendar calendar = Calendar.getInstance();
+
+            Cursor dataNgayLap = databases.getData("select * from NgayLap where id = " + id);
+            if (dataNgayLap.getCount() == 0){
+                if (id != 0){
+                    databases = new Databases(ActivityTatBaothucGiaiToan.this, "baothuc.sqlite", null, 1);
+                    databases.QueryData("UPDATE BaoThuc SET IsTurn = 0 WHERE id =" + id);
+
+                }
+            }else {
+                databases.QueryData("UPDATE BaoThuc SET IsTurn = 1 WHERE id =" + id);
+                String thoiGian = "";
+                Cursor dataBaoThuc = databases.getData("select * from BaoThuc where id = " + id);
+                final Intent intent = new Intent(ActivityTatBaothucGiaiToan.this, AlarmReceiver.class);
+
+                while (dataBaoThuc.moveToNext()){
+                    thoiGian = dataBaoThuc.getString(1);
+                }
+                int hour = Integer.parseInt(thoiGian.substring(0, 2));
+                int mi = Integer.parseInt(thoiGian.substring(3, 5));
+
+                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                calendar.set(Calendar.MINUTE, mi);
+                calendar.set(Calendar.SECOND, 0);
+
+                int thu = calendar.get(Calendar.DAY_OF_WEEK);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        ActivityTatBaothucGiaiToan.this, (id + 1) * 10000 + thu, intent, PendingIntent.FLAG_UPDATE_CURRENT
+                );
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis() + 7*24*60*60*1000, pendingIntent);
+            }
+        }
     }
 }
